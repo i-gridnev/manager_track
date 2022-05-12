@@ -20,4 +20,6 @@ class ProdConfig(Config):
 class DevConfig(Config):
     DEBUG = True
     TESTING = True
+    SQLALCHEMY_ECHO=True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI')

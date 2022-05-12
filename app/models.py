@@ -49,6 +49,10 @@ class Task(db.Model):
     def for_today():
         return (func.date(Task.created_at) == func.curdate())
 
+    @staticmethod
+    def for_today_without_report():
+        return (func.date(Task.created_at) == func.curdate(), Task.report_id == None)
+
 
 class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,3 +65,6 @@ class Report(db.Model):
     def __repr__(self):
         return f'report {self.report_title}'
 
+    @staticmethod
+    def for_today():
+        return (func.date(Report.created_at) == func.curdate())

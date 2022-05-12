@@ -1,30 +1,42 @@
-<div class="row p-3 justify-content-center">
-    <div class="col-lg-8">
-        <h4>Добавление отчета по задачам на сегодня</h4>
-
-        <form action="{{ url_for('cabinet_bp.add_report') }}" method="post" name="form">
-            {{ form_report.csrf_token }}
-            <div class="mb-3">
-                {{ form_report.report_title.label()}}
-                {{ form_report.report_title(class="form-control") }}
-                <div id="task-title-help" class="form-text">*Название не
-                    должно быть
-                    длинее 15
-                    символов</div>
+<div class="row p-3">
+    <form action="{{ url_for('cabinet_bp.add_report') }}" method="post" name="form">
+        {{ form_report.csrf_token }}
+        <div class="col-12 mb-2 text-center">
+            <h4>Добавление отчета по задачам на сегодня</h4>
+        </div>
+        <div class="row mx-3 p-3 border rounded shadow-lg">
+            <div class="col">
+                <div class="mb-3">
+                    {{ form_report.report_title.label()}}
+                    {{ form_report.report_title(class="form-control") }}
+                    <div id="task-title-help" class="form-text">*Название не
+                        должно быть
+                        длинее 15
+                        символов</div>
+                </div>
+                <div class="mb-3">
+                    {{ form_report.report_desc.label()}}
+                    {{ form_report.report_desc(class="form-control") }}
+                    <style>
+                        .ck-editor__editable_inline {
+                            min-height: 200px;
+                        }
+                    </style>
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
             </div>
-            <div class="mb-3">
-                {{ form_report.report_desc.label()}}
-                {{ form_report.report_desc(class="form-control") }}
-                <style>
-                    .ck-editor__editable_inline {
-                        min-height: 200px;
-                    }
-                </style>
+            <div class="col-3">
+                <h6>Выберите задачи под этот отчет</h6>
+                {% for task in task_to_report %}
+                <div class="form-check">
+                    {{ form_report[task](class="form-check-input") }}
+                    {{ form_report[task].label(class="form-check-label") }}
+                </div>
+                {% endfor %}
             </div>
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Добавить</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-            </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>

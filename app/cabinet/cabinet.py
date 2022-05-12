@@ -1,9 +1,10 @@
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import login_required, current_user
+from wtforms import BooleanField
 from app.auth.auth import role_required
 from app.forms import TaskForm, ReportForm
 from app.ext import db
-from app.models import Task
+from app.models import Task, Report
 
 cabinet_bp = Blueprint('cabinet_bp', __name__, template_folder='templates')
 
@@ -13,9 +14,25 @@ cabinet_bp = Blueprint('cabinet_bp', __name__, template_folder='templates')
 @role_required('manager')
 def manager_panel():
     form_task = TaskForm()
+    user_tasks = current_user.tasks.filter(Task.for_today()).all()
+    user_reports = current_user.reports.filter(Report.for_today()).all()
+    task_to_report = []
+    for task in user_tasks:
+        if not task.report_id:
+            task_id = f'task_{task.id}'
+            task_to_report.append(task_id)
+            setattr(ReportForm, task_id, BooleanField(task.task_title))
     form_report = ReportForm()
-    user_tasks = current_user.tasks.filter(Task.for_today())
-    return render_template('manager.html', user_tasks=user_tasks, form_task=form_task, form_report=form_report)
+
+    context = {
+        'user_tasks': user_tasks,
+        'task_to_report': task_to_report,
+        'form_task': form_task,
+        'form_report': form_report,
+        'user_reports': user_reports
+    }
+
+    return render_template('manager.html', **context)
 
 
 @cabinet_bp.route('/add_task', methods=['POST'])
@@ -24,8 +41,10 @@ def manager_panel():
 def add_task():
     form_task = TaskForm()
     if form_task.validate_on_submit():
-        current_user.add_task(
-            task_title=form_task.task_title.data, task_desc=form_task.task_desc.data)
+        new_task = Task(task_title=form_task.task_title.data,
+                        task_desc=form_task.task_desc.data)
+        db.session.add(new_task)
+        current_user.tasks.append(new_task)
         db.session.commit()
         flash('Задача успешно добавлена!', 'success')
         return redirect(url_for('cabinet_bp.manager_panel'))
@@ -38,10 +57,14 @@ def add_report():
     form_report = ReportForm()
     if form_report.validate_on_submit():
         report_title = form_report.report_title.data
-        # report_desc = add_report_form.report_desc.data
-        # current_user.add_task(task_title=task_title, task_desc=task_desc)
-        # db.session.commit()
-        flash(f'Отчет "{report_title}" успешно добавлен!', 'success')
+        report_desc = form_report.report_desc.data
+        new_report = Report(report_title=report_title, report_desc=report_desc)
+        current_user.reports.append(new_report)
+        for task in current_user.tasks.filter(*Task.for_today_without_report()).all():
+            if form_report[f'task_{task.id}'].data:
+                new_report.task.append(task)
+        db.session.commit()
+        flash(f'Отчет {report_title} успешно добавлен!', 'success')
         return redirect(url_for('cabinet_bp.manager_panel'))
 
 
