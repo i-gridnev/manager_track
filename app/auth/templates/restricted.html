@@ -1,0 +1,17 @@
+{% extends 'base_layout.html' %}
+{% block page_title %}Логин{% endblock %}
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row my-5 justify-content-center">
+            <div class="col-sm-10 col-md-8 col-lg-6 p-4 border shadow-lg text-center" style="border-radius: 1rem;">
+                {% include 'includes/flashmessages.html' %}
+                {% if current_user.is_admin() %}
+                <a href="{{ url_for('cabinet_bp.admin_panel') }}">Вернуться в личный кабинет</a>
+                {% else %}
+                <a href="{{ url_for('cabinet_bp.manager_panel') }}">Вернуться в личный кабинет</a>
+                {% endif %}
+            </div>
+        </div>
+</main>
+{% endblock %}

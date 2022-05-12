@@ -1,0 +1,12 @@
+<div class="row mt-5 p-2">
+    <div class="col-md-2 col-lg-1 d-none d-md-block my-auto">
+        <img src="{{ url_for('static', filename='images/person1.png') }}" class="img-fluid" alt="">
+    </div>
+    <div class="col-md-8">
+        <h3>{{current_user.username}}</h3>
+        <p>{{current_user.position}}</p>
+    </div>
+    <div class="col text-end">
+        <p>Контакты поддержки: 421048434</p>
+    </div>
+</div>

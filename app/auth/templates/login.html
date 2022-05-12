@@ -1,0 +1,53 @@
+{% extends 'base_layout.html' %}
+{% block page_title %}Логин{% endblock %}
+{% block content %}
+<main>
+    <div class="container">
+        <div class="row my-5 justify-content-center">
+            <div class="col-sm-10 col-md-8 col-lg-6 p-4 border shadow-lg text-center" style="border-radius: 1rem;">
+                <h3>Вход</h3>
+                <p class="mb-3">
+                    Для входа в кабинет введите ваше имя и пароль
+                </p>
+                <form action="{{ url_for('auth_bp.login') }}" method="post" name="form" class="needs-validation p-4"
+                    novalidate>
+                    {{ form.csrf_token }}
+                    <div class="form-floating mb-4">
+                        {{ form.name(class="form-control") }}
+                        {{ form.name.label()}}
+                        <div class="invalid-feedback">
+                            Обязательное поле от 4 до 30 символов
+                        </div>
+                    </div>
+                    <div class="form-floating mb-4">
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+                        {{ form.password.label()}}
+                        <div class="invalid-feedback">
+                            Обязательное поле
+                        </div>
+                    </div>
+                    {% include 'includes/flashmessages.html' %}
+                    {{ form.submit(class="btn btn-primary w-50")}}
+                </form>
+            </div>
+        </div>
+</main>
+{% endblock %}
+{% block custom_js %}
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+{% endblock %}

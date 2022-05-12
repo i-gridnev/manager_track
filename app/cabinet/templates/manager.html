@@ -1,0 +1,59 @@
+{% extends 'base_layout.html' %}
+{% from 'includes/macros.html' import menu_item with context %}
+{% from 'includes/macros.html' import item_tab with context %}
+{% block page_title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container-sm px-sm-5">
+        {% include 'includes/manager_cresentials.html' %}
+        <div class="row border shadow-lg">
+            <ul class="nav nav-pills" id="myTab" role="tablist">
+                {{ menu_item(name='Задачи', control='tasks', active='active') }}
+                {{ menu_item(name='Отчеты', control='reports') }}
+                {{ menu_item(name='Добавить задачу', control='add_task') }}
+                {{ menu_item(name='Добавить отчет', control='add_report') }}
+                {{ menu_item(name='Мой профиль', control='profile') }}
+            </ul>
+        </div>
+        <div class="row border">
+            <div class="col-12 tab-content py-2 mb-5" id="myTabContent">
+                {{ item_tab(control='tasks', active='active') }}
+                {{ item_tab(control='reports') }}
+                {{ item_tab(control='add_task') }}
+                {{ item_tab(control='add_report') }}
+                {{ item_tab(control='profile') }}
+            </div>
+        </div>
+    </div>
+</main>
+{% include 'includes/flash.html' %}
+{% endblock %}
+
+{% block custom_js %}
+{{ ckeditor.load(custom_url=url_for('static', filename='ckeditor.js')) }}
+<script type="text/javascript">
+    ClassicEditor
+        .create(document.querySelector('#task_desc'))
+        .catch(error => {
+            console.error(error);
+        });
+
+    ClassicEditor
+        .create(document.querySelector('#report_desc'))
+        .catch(error => {
+            console.error(error);
+        });
+    
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    window.onload = (event) => {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl)
+        });
+        toastList.forEach((element) => {
+            element.show()
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% macro menu_item(name, control, active='') %}
+<li class="nav-item" role="presentation">
+    <button class="nav-link {{ active }}" id="{{ control }}" data-bs-toggle="tab" data-bs-target="#{{ control+'-tab' }}"
+        type="button" role="tab" aria-controls="{{ control+'-tab' }}">{{name}}</button>
+</li>
+{% endmacro %}
+
+{% macro item_tab(control, active='') %}
+<div class="tab-pane fade {{ 'show active' if active == 'active' }}" id="{{ control+'-tab' }}" role="tabpanel"
+    aria-labelledby="{{ control }}">
+    {% include 'includes/'+control+'.html' %}
+</div>
+{% endmacro %}
