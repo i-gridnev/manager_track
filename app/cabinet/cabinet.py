@@ -4,7 +4,7 @@ from wtforms import BooleanField
 from app.auth.auth import role_required
 from app.forms import TaskForm, ReportForm
 from app.ext import db
-from app.models import Task, Report
+from app.models import Task, Report, User
 
 cabinet_bp = Blueprint('cabinet_bp', __name__, template_folder='templates')
 
@@ -68,8 +68,30 @@ def add_report():
         return redirect(url_for('cabinet_bp.manager_panel'))
 
 
-@cabinet_bp.route('/admin', methods=['GET', 'POST'])
+@cabinet_bp.route('/admin/', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
 def admin_panel():
-    return render_template('admin.html')
+    all_users_list = User.query.filter_by(role='manager').all()
+    return render_template('admin/managers.html', all_users_list=all_users_list)
+
+
+@cabinet_bp.route('/admin/<user_id>/')
+@login_required
+@role_required('admin')
+def manager_stats(user_id):
+
+    data = User.query.options(db.joinedload(User.tasks)).options(db.joinedload(User.reports)).get(user_id)
+    user = {'username': data.username, 'position':  data.position}
+    tasks_no_reports = []
+    reports = {}
+    for t in data.tasks:
+        if t.report:
+            if reports.get(t.report):
+                reports[t.report.id]['tasks'].append(t)
+            else:
+                reports[t.report.id] = {'report': t.report, 'tasks': [t]}
+        else:
+            tasks_no_reports.append(t)
+
+    return render_template('admin/manager-reports.html', user=user, reports=reports)

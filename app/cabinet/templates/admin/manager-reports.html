@@ -1,0 +1,22 @@
+{% extends 'admin_layout.html' %}
+{% block tabcontent %}
+<div class="row">
+    <div class="col-md-2 col-lg-1 d-none d-md-block my-auto">
+        <img src="{{ url_for('static', filename='images/person1.png') }}" class="img-fluid" alt="">
+    </div>
+    <div class="col-md-8">
+        <h6>{{user.username}}</h6>
+        <p>{{user.position}}</p>
+    </div>
+</div>
+<div class="row">
+
+    {% for report in reports %}
+        {{ report.report_title }}  -- 
+            {% for task in report.task %}
+            --{{ task.task_title }}
+            {% endfor %}
+        <br>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -10,8 +10,8 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(120), unique=False, nullable=False)
     position = db.Column(db.String(120), unique=False, nullable=False)
     role = db.Column(db.String(15), unique=False, nullable=False)
-    tasks = db.relationship('Task', backref='user', lazy='dynamic')
-    reports = db.relationship('Report', backref='user', lazy='dynamic')
+    tasks = db.relationship('Task', backref='user')
+    reports = db.relationship('Report', backref='user')
 
     def __repr__(self):
         return f'User {self.username}'

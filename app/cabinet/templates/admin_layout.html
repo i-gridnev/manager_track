@@ -1,6 +1,4 @@
 {% extends 'base_layout.html' %}
-{% from 'includes/macros.html' import menu_item with context %}
-{% from 'includes/macros.html' import item_tab with context %}
 {% block page_title %}Личный кабинет{% endblock %}
 
 {% block content %}
@@ -8,14 +6,20 @@
     <div class="container-sm border">
         {% include 'includes/manager_cresentials.html' %}
         <div class="row border shadow-lg">
-            <ul class="nav nav-pills" id="myTab" role="tablist">
-                {{ menu_item(name='Мой профиль', control='profile', active='active') }}
-                {{ menu_item(name='Мой профиль', control='profile') }}
+            <ul class="nav">
+                <li class="nav-item" role="presentation">
+                    <a href="{{ url_for('cabinet_bp.admin_panel')}}" class="btn btn-primary">Менеджеры</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a href="{{ url_for('cabinet_bp.manager_stats', user_id=2)}}" class="btn btn-primary">Отчеты</a>
+                </li>
+
             </ul>
         </div>
         <div class="row">
-            <div class="col-12 tab-content py-2 mb-5" id="myTabContent">
-                {{ item_tab(control='profile', active='active') }}
+            <div class="col-12 py-2 mb-5">
+                {% block tabcontent %}             
+                {% endblock %}
             </div>
         </div>
     </div>
