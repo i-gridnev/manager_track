@@ -10,13 +10,75 @@
     </div>
 </div>
 <div class="row">
+    <div class="col-4">
+        <div class="list-group" id="list-tab" role="tablist">
+            {% for report, task_list in data.items() %}
 
-    {% for report in reports %}
-        {{ report.report_title }}  -- 
-            {% for task in report.task %}
-            --{{ task.task_title }}
+            <a class="list-group-item bg-primary text-white list-group-item-action w-50 align-self-start my-2" id="list-report{{ report.id }}" data-bs-toggle="list"
+                href="#report{{ report.id }}" role="tab" aria-controls="list-report{{ report.id }}">
+                Отчет: {{ report.report_title }}</a>
+            {% for task in task_list %}
+            <a class="list-group-item bg-success text-white w-75 align-self-end list-group-item-action" id="list-task{{ task.id }}" data-bs-toggle="list"
+                href="#task{{ task.id }}" role="tab" aria-controls="list-report{{ task.id }}">
+                {{ task.task_title }}</a>
             {% endfor %}
-        <br>
-    {% endfor %}
+            {% endfor %}
+
+            <a class="list-group-item list-group-item-action bg-danger text-white w-50 align-self-start my-2" data-bs-toggle="list" role="tab">Без отчета:</a>
+            {% for task in not_reported %}
+            <a class="list-group-item list-group-item-action bg-secondary text-white w-75 align-self-end" id="list-task{{ task.id }}" data-bs-toggle="list"
+                href="#task{{ task.id }}" role="tab" aria-controls="list-report{{ task.id }}">
+                {{ task.task_title }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-8">
+        <div class="tab-content p-3" id="nav-tabContent">
+            {% for report, task_list in data.items() %}
+
+            <div class="tab-pane fade" id="report{{ report.id }}" role="tabpanel"
+                aria-labelledby="list-report{{ report.id }}">
+                <div class="row">
+                    <div class="col">
+                        Отчет: {{ report.report_title }} | от {{ report.created_at }}
+                    </div>
+                    <div class="col text-end">
+                        Отчет создан в {{ report.created_at.strftime('%H:%M:%S') }}
+                    </div>
+                    <div class="col-12 mt-4">{{ report.report_desc | safe }}</div>
+                </div>
+            </div>
+
+            {% for task in task_list %}
+            <div class="tab-pane fade" id="task{{ task.id }}" role="tabpanel"
+                aria-labelledby="list-task{{ task.id }}">
+                <div class="row">
+                    <div class="col">
+                        Задача: {{ task.task_title }} | от {{ task.created_at }}
+                    </div>
+                    <div class="col text-end">
+                        Задача создана в {{ task.created_at.strftime('%H:%M:%S') }}
+                    </div>
+                    <div class="col-12 mt-4">{{ task.task_desc | safe }}</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endfor %}
+            {% for task in not_reported %}
+            <div class="tab-pane fade" id="task{{ task.id }}" role="tabpanel"
+                aria-labelledby="list-task{{ task.id }}">
+                <div class="row">
+                    <div class="col">
+                        Задача: {{ task.task_title }} | от {{ task.created_at }}
+                    </div>
+                    <div class="col text-end">
+                        Задача создана в {{ task.created_at.strftime('%H:%M:%S') }}
+                    </div>
+                    <div class="col-12 mt-4">{{ task.task_desc | safe }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}

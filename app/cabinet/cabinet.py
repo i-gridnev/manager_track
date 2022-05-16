@@ -81,17 +81,22 @@ def admin_panel():
 @role_required('admin')
 def manager_stats(user_id):
 
-    data = User.query.options(db.joinedload(User.tasks)).options(db.joinedload(User.reports)).get(user_id)
-    user = {'username': data.username, 'position':  data.position}
-    tasks_no_reports = []
-    reports = {}
-    for t in data.tasks:
-        if t.report:
-            if reports.get(t.report):
-                reports[t.report.id]['tasks'].append(t)
-            else:
-                reports[t.report.id] = {'report': t.report, 'tasks': [t]}
-        else:
-            tasks_no_reports.append(t)
+    # data = User.query.options(db.joinedload(User.tasks)).options(db.joinedload(User.reports)).get(user_id)
 
-    return render_template('admin/manager-reports.html', user=user, reports=reports)
+    # data = db.session.query(Task, Report, User).filter(Task.for_today(), Task.author_id == user_id).join(
+    #     Report, Report.id == Task.report_id).join(User, User.id == Report.author_id).all()
+
+    q = db.session.query(Task, Report, User).filter(Task.for_today(), Task.author_id == user_id).outerjoin(Report, Report.id == Task.report_id).join(User, User.id == Task.author_id).all()
+    
+    user = q[0][2]  
+    data = {}
+    not_reported = []
+    for task, report, _ in q:
+        if not report:
+            not_reported.append(task)
+        elif data.get(report):
+            data[report].append(task)
+        else:
+            data[report] = [task]
+
+    return render_template('admin/manager-reports.html', user=user, data=data, not_reported=not_reported)

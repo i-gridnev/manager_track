@@ -10,8 +10,8 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(120), unique=False, nullable=False)
     position = db.Column(db.String(120), unique=False, nullable=False)
     role = db.Column(db.String(15), unique=False, nullable=False)
-    tasks = db.relationship('Task', backref='user')
-    reports = db.relationship('Report', backref='user')
+    tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    reports = db.relationship('Report', backref='user', lazy='dynamic')
 
     def __repr__(self):
         return f'User {self.username}'
@@ -60,7 +60,7 @@ class Report(db.Model):
     report_desc = db.Column(db.String(1200), unique=False, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now())
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    task = db.relationship('Task', backref='report', lazy='dynamic')
+    task = db.relationship('Task', backref='report')
 
     def __repr__(self):
         return f'report {self.report_title}'
