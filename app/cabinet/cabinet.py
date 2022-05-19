@@ -1,5 +1,6 @@
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import login_required, current_user
+from sqlalchemy import outerjoin
 from wtforms import BooleanField
 from app.auth.auth import role_required
 from app.forms import TaskForm, ReportForm
@@ -80,18 +81,13 @@ def admin_panel():
 @login_required
 @role_required('admin')
 def manager_stats(user_id):
-
-    # data = User.query.options(db.joinedload(User.tasks)).options(db.joinedload(User.reports)).get(user_id)
-
-    # data = db.session.query(Task, Report, User).filter(Task.for_today(), Task.author_id == user_id).join(
-    #     Report, Report.id == Task.report_id).join(User, User.id == Report.author_id).all()
-
-    q = db.session.query(Task, Report, User).filter(Task.for_today(), Task.author_id == user_id).outerjoin(Report, Report.id == Task.report_id).join(User, User.id == Task.author_id).all()
-    
-    user = q[0][2]  
+    user = User.query.filter_by(id=user_id).first()
+    querydata = db.session.query(Task, Report).join(Report, isouter=True).filter(
+        Task.for_today(),
+        Task.author_id == user_id)
     data = {}
     not_reported = []
-    for task, report, _ in q:
+    for task, report in querydata:
         if not report:
             not_reported.append(task)
         elif data.get(report):
