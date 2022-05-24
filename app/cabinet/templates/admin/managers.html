@@ -1,10 +1,5 @@
 {% extends 'admin_layout.html' %}
 {% block tabcontent %}
-<div class="row mt-3 ms-1">
-    <div class="col-4">
-        <button type="button" class="btn btn-primary">Добавить менеджера</button>
-    </div>
-</div>
 <div class="row p-3">
     <div class="col">
         <table class="table table-bordered table-striped table-hover">
@@ -34,7 +29,9 @@
                                     Действие
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><a class="dropdown-item" href="#">Просмотр отчетов</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{{ url_for('cabinet_bp.manager_stats', user_id=user.id)}}">Просмотр
+                                            отчетов</a></li>
                                     <li><a class="dropdown-item" href="#">Написать письмо</a></li>
                                     <li><a class="dropdown-item" href="#">Удалить</a></li>
                                 </ul>

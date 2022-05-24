@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length
 from flask_ckeditor import CKEditorField
 
@@ -22,3 +22,14 @@ class ReportForm(FlaskForm):
     report_title = StringField('Название отчета', validators=[DataRequired(message='Введите название'), Length(
         min=4, max=15, message='Имя должно быть от 4 до 15 символов')], render_kw={"placeholder": "Ввелите название для отчета"})
     report_desc = CKEditorField('Отчет')
+
+
+class AddManagerForm(FlaskForm):
+    name = StringField('Имя пользователя', validators=[DataRequired(message='Введите имя'), Length(
+        min=4, max=30, message='Имя должно быть от 4 до 30 символов')], render_kw={"placeholder": "Введите имя пользователя"})
+    position = StringField('Должность', validators=[DataRequired(message='Введите должность'), Length(
+        min=4, max=120, message='Имя должно быть от 4 до 120 символов')], render_kw={"placeholder": "Введите должность"})
+    password = StringField('Пароль', validators=[DataRequired()], render_kw={
+                           "placeholder": "Введите пароль"})
+    role = SelectField('Роль', choices=[('manager', 'manager'), ('admin', 'admin')])
+    submit = SubmitField('Добавить')

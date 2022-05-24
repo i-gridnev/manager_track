@@ -1,9 +1,9 @@
+from crypt import methods
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import login_required, current_user
-from sqlalchemy import outerjoin
 from wtforms import BooleanField
 from app.auth.auth import role_required
-from app.forms import TaskForm, ReportForm
+from app.forms import TaskForm, ReportForm, AddManagerForm
 from app.ext import db
 from app.models import Task, Report, User
 
@@ -15,14 +15,23 @@ cabinet_bp = Blueprint('cabinet_bp', __name__, template_folder='templates')
 @role_required('manager')
 def manager_panel():
     form_task = TaskForm()
-    user_tasks = current_user.tasks.filter(Task.for_today()).all()
-    user_reports = current_user.reports.filter(Report.for_today()).all()
+    # user_tasks = current_user.tasks.filter(Task.for_today()).all()
+    # user_reports = current_user.reports.filter(Report.for_today()).all()
+
+    # query = db.session.query(Task, Report).join(Report, isouter=True).filter(Task.for_today())
+    user_tasks = []
+    user_reports = []
     task_to_report = []
-    for task in user_tasks:
-        if not task.report_id:
+    query = db.session.query(Task, Report).join(Report, isouter=True).filter(
+        Task.for_today(), Task.author_id == current_user.id)
+    for task, report in query:
+        user_tasks.append(task)
+        if not report:
             task_id = f'task_{task.id}'
             task_to_report.append(task_id)
             setattr(ReportForm, task_id, BooleanField(task.task_title))
+        else:
+            user_reports.append(report)
     form_report = ReportForm()
 
     context = {
@@ -96,3 +105,21 @@ def manager_stats(user_id):
             data[report] = [task]
 
     return render_template('admin/manager-reports.html', user=user, data=data, not_reported=not_reported)
+
+
+@cabinet_bp.route('/admin/add_manager/', methods=['GET', 'POST'])
+@login_required
+@role_required('admin')
+def add_manager():
+    form_add_manager = AddManagerForm()
+    if form_add_manager.validate_on_submit():
+        username = form_add_manager.name.data
+        position = form_add_manager.position.data
+        password = form_add_manager.password.data
+        role = form_add_manager.role.data
+        new_user = User(username, password, position, role)
+        db.session.add(new_user)
+        db.session.commit()
+        flash(f'Пользователь {username} успешно создан!', 'success')
+        return redirect(url_for('cabinet_bp.admin_panel'))
+    return render_template('admin/add_manager.html', form_add_manager=form_add_manager)
